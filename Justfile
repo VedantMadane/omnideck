@@ -341,6 +341,7 @@ e2e *args:
         -e DISPLAY=:$port \
         -e ENABLE_DESKTOP=false \
         -e MOCK_LLM=1 \
+        -e OMNIDECK_ENABLE_TEST_INTEGRATIONS=1 \
         "${env_args[@]}" \
         -v "$state/home:/home/omnideck:rw,z" \
         -v "$state/state:/var/lib/omnideck:rw,z" \
@@ -365,7 +366,9 @@ e2e *args:
         -d '{"custom_tools_enabled":true}' >/dev/null
 
     targets="{{args}}"
-    OMNIDECK_URL="http://localhost:$port" OMNIDECK_CONTAINER="$name" PYTHONPATH=. uv run pytest ${targets:-tests/e2e/}
+    OMNIDECK_URL="http://localhost:$port" OMNIDECK_CONTAINER="$name" \
+        OMNIDECK_CONTAINER_ENGINE="$engine" PYTHONPATH=. \
+        uv run pytest ${targets:-tests/e2e/}
 
 
 # =============================================================================
@@ -519,7 +522,7 @@ _ui-build ctr:
 # runs each in a respawn loop, so killing the inner Python lets the loop
 # pick it back up with the freshly synced source.
 _bounce-services ctr:
-    @bash scripts/container-engine.sh exec {{ctr}} pkill -f "python3.12 -m integrations.supervisor" 2>/dev/null || true
+    @bash scripts/container-engine.sh exec {{ctr}} pkill -f "python3.12 -m brokering.supervisor" 2>/dev/null || true
     @bash scripts/container-engine.sh exec {{ctr}} pkill -f "python3.12 main.py" 2>/dev/null || true
 
 # Poll until the app responds on the given port (up to ~60s)

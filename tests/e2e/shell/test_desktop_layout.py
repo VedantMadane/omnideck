@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-import re
-
 from playwright.sync_api import Page, expect
 
 from tests.e2e.pages import ChatView, DesktopLayout
@@ -199,10 +197,10 @@ def test_tab_can_float_over_sidebar_resize_fullscreen_and_redock(page: Page):
     # initialize back to Skills even if the generic View host looked stable.
     system_tab = page.get_by_test_id("settings-tab-system")
     system_tab.click()
-    expect(system_tab).to_have_class(re.compile("tabActive"))
+    expect(system_tab).to_have_attribute("aria-selected", "true")
 
     def expect_settings_state_preserved() -> None:
-        expect(system_tab).to_have_class(re.compile("tabActive"))
+        expect(system_tab).to_have_attribute("aria-selected", "true")
 
     desktop.float("destination:settings")
 
